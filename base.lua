@@ -30,6 +30,14 @@ function doSwitching()
 	--todo: implemetn it
 end
 
+function extractMainHeader(msg)
+	local senderID = string.sub(massage, 1, 4)
+	local targetID = string.sub(massage, 5, 8)
+	local msgType = string.sub(massage, 10, 11)
+	local msgBody = string.sub(massage, 12,-1)
+	return senderID, targetID, msgType, msgBody
+end
+
 function mkMsg(msg, targetID, msgType)
 	return ID .. targetID .. msgType .. msg
 end
@@ -83,10 +91,7 @@ function lisenNet()
 	while true do
 		local event , side, channel, replyChannel, massage, distance = os.pullEvent("modem_message")
 		massage = tostring(message)
-		local senderID = string.sub(massage, 1, 4)
-		local targetID = string.sub(massage, 5, 8)
-		local msgType = string.sub(massage, 10, 11)
-		local msgBody = string.sub(massage, 12,-1)
+		local senderID, targetID,  msgType, msgBody = extractMainHeader(massage)
 		if targetID ~= ID then
 			if Switching == false then
 				goto continue_net
