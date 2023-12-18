@@ -33,11 +33,12 @@ end
 function extractMainHeader(msg)
 	local senderID = string.sub(massage, 1, 4)
 	local targetID = string.sub(massage, 5, 8)
-	local msgType = string.sub(massage, 10, 11)
-	local msgBody = string.sub(massage, 12,-1)
+	local msgType = string.sub(massage, 9, 9)
+	local msgBody = string.sub(massage, 10,-1)
 	return senderID, targetID, msgType, msgBody
 end
 
+--todo input validation
 function mkMsg(msg, targetID, msgType)
 	return ID .. targetID .. msgType .. msg
 end
@@ -52,12 +53,21 @@ function send(msg)
 	end
 end
 
+function extractRequestHeader(msg)
+	local msgID = string.sub(msg, 1,4)
+	local msgType = string.sub(msg, 5,8)
+	local msgBody = string.sub(msg, 9,-1)
+	return msgID, msgType, msgBody
+end
+
+--todo input validation
+function mkReq(msgID, msgType, msgBody)
+	return msgID .. msgType .. msgBody
+end
+
 function request(msg,  senderID)
 --handle requests (general header striped)	
-
-	local msgID = string.sub(msg, 1,4)
-	local msgType = string.sub(msg, 4,7)
-	local msgBody = string.sub(msg, 7,-1)
+	local msgID, msgType, msgBody = extractRequestHeader(msg)
 	if msgType == "ECHO" then
 		send(mkMsg(msgID .. msgBody, senderID, "A"))	
 	elseif msgType == "SUPR" then
@@ -65,6 +75,16 @@ function request(msg,  senderID)
 	end
 end
 
+function extractAnswerHeader(msg)
+	local msgID = string.sub(msg, 1,4)
+	local msgBody = string.sub(msg, 5, -1) 
+	return msgID, msgBody
+end
+
+--todo input validation
+function mkAns(msgID, msgBody)
+	return msgID .. msgBody
+end
 function answer(msg)
 --handle answers (general header striped)	
 
