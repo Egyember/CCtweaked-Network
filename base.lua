@@ -24,6 +24,7 @@ end
 
 osAlarmID = os.setAlarm(os.time() + osloop)
 
+-- low level functions for networking
 function doSwitching()
 	print("not implemeted yet\n")
 	--todo: implemetn it
@@ -71,13 +72,21 @@ function set(msg)
 
 end
 
+--high level functions for networking (for example: ping)
+function ping(targetID)
+	--generating payload
+	local payload = string.format("%05d", math.floor(math.random*10000))
 
-while do
-	local event , side, channel, replyChannel, massage, distance = os.pullEvent()
-	if event == "modem_message" then
+end
+
+function lisenNet()
+	while true do
+		local event , side, channel, replyChannel, massage, distance = os.pullEvent("modem_message")
 		massage = tostring(message)
 		local senderID = string.sub(massage, 1, 4)
 		local targetID = string.sub(massage, 5, 8)
+		local msgType = string.sub(massage, 10, 11)
+		local msgBody = string.sub(massage, 12,-1)
 		if targetID ~= ID then
 			if Switching == false then
 				goto continue_net
@@ -85,27 +94,34 @@ while do
 			doSwitching()
 			goto continue_net
 		end
-		local msgType = string.sub(massage, 10, 11)
 		if msgType == "R" then
 			--handle requests
-			request(string.sub(massage, 12,-1), senderID)
+			request(msgBody, senderID)
+	--[[	this shoud be handeled elsewhere
 		elseif msgType == "A" then
 			--handle answers
 			answer(string.sub(massage, 12,-1))
+
+	]]--
 		elseif msgType == "D" then
 			--handle do
-			doing(string.sub(massage, 12,-1))
+			doing(msgBody)
 		elseif msgType == "S" then
 			--handle set
-			set(string.sub(massage, 12, -1))
+			set(msgBody)
 		end
-	::continue_net::
-	elseif event == "alarm" then
-		local alarmIDret = side --changeing reference
+		::continue_net::
+	end
+end
+function localruning()
+	while true do
+		local event, alarmIDret = os.pullEvent("alarm")
 		if osAlarmID == alarmIDret then
 			--main loop of the computer
-
+			
 		osAlarmID = os.setAlarm(os.time() + osloop)
 		end
 	end
 end
+
+parallel.waitForAll(lisenNet, localruning)
