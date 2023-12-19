@@ -39,7 +39,7 @@ function doSwitching()
 end
 
 function extractMainHeader(msg)
-	print("extractMainHeader called with" .. msg)
+--	print("extractMainHeader called with " .. msg)
 	local senderID = string.sub(msg, 1, 4)
 	local targetID = string.sub(msg, 5, 8)
 	local msgType = string.sub(msg, 9, 9)
@@ -136,7 +136,6 @@ end
 function lisenNet()
 	while true do
 		local event , side, channel, replyChannel, massage, distance = os.pullEvent("modem_message")
-		massage = tostring(message)
 		local senderID, targetID,  msgType, msgBody = extractMainHeader(massage)
 		if targetID == ID then
 			if msgType == "R" then
