@@ -110,7 +110,7 @@ end
 --high level functions for networking (for example: ping)
 function ping(targetID)
 	--generating payload
-	local payload = string.format("%05d", math.floor(math.random*10000))
+	local payload = string.format("%05d", math.floor(math.random()*10000))
 	local msgID = getReqId()
 	--sending ping
 	print("sending ping")
