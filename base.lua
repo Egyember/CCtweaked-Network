@@ -10,6 +10,7 @@ suportedREQs = "ECHO,SUPR"
 lastReqID = 0
 function getReqId()
 	if lastReqID == 9999 then
+		lastReqID = 0
 		return "0000"
 	end
 	lastReqID = lastReqID + 1
@@ -38,10 +39,11 @@ function doSwitching()
 end
 
 function extractMainHeader(msg)
-	local senderID = string.sub(massage, 1, 4)
-	local targetID = string.sub(massage, 5, 8)
-	local msgType = string.sub(massage, 9, 9)
-	local msgBody = string.sub(massage, 10,-1)
+	print("extractMainHeader called with" .. msg)
+	local senderID = string.sub(msg, 1, 4)
+	local targetID = string.sub(msg, 5, 8)
+	local msgType = string.sub(msg, 9, 9)
+	local msgBody = string.sub(msg, 10,-1)
 	return senderID, targetID, msgType, msgBody
 end
 
@@ -55,7 +57,7 @@ function send(msg)
 		--not implemented yet
 		return
 	end
-	for i = 1 , #modems, i do
+	for i = 1 , #modems, 1 do
 		modems[i].transmit(port, port, msg)
 	end
 end
