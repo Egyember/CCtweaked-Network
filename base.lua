@@ -1,7 +1,7 @@
 --constants
 ID = "base" --must be 4 char
 switchlikeMode = false --switching table
-Switching = false
+switching = false
 port = 41
 osloop = 1
 suportedREQs = "ECHO,SUPR"
@@ -19,23 +19,40 @@ end
 
 
 -- finding modems and wraping them
-modems = {}
-perNames = peripheral.getNames()
-for i = 1 , #perNames, 1 do
-	if peripheral.getType(perNames[i]) == "modem" then
-		modems[#modems+1] = peripheral.wrap(perNames[i])
+do
+	modems = {}
+	modemSides = {}
+	local perNames = peripheral.getNames()
+	for i = 1 , #perNames, 1 do
+		if peripheral.getType(perNames[i]) == "modem" then
+			modemSides[#modemSides +1] = perNames[i]
+		end
+	end
+	for i = 1, #modemSides do
+		modems[modemSides[i]] = peripheral.wrap(modemSides[i])
+	end
+	--init modems
+	for i = 1, #modemSides do
+		modems[modemSides].open(port)
 	end
 end
 
---init modems
-for i = 1, #modems, 1 do
-	modems[i].open(port)
+-- low level functions for networking
+switchingTable = {}
+function addSwitchingTable(senderID, side)
+	switchingTable[senderID] = side	
 end
 
--- low level functions for networking
-function doSwitching()
-	print("not implemeted yet\n")
-	--todo: implemetn it
+function doSwitching(side, senderID, msg)
+	local targetSide = switchingTable[targetID]
+	if targetSide == nil then
+		for i = 1 , #modemSides do
+			if modemSides[i] ~= side then
+				modems[modemSides[i]].transmit(port, port, msg)
+			end
+		end
+	end
+	modems[targetSide].transmit(port, port, msg)
 end
 
 function extractMainHeader(msg)
@@ -47,20 +64,17 @@ function extractMainHeader(msg)
 	return senderID, targetID, msgType, msgBody
 end
 
---todo input validation
-function mkMsg(targetID, msgType, msg)
-	return ID .. targetID .. msgType .. msg
-end
-
-function send(msg)
-	if switchlike == true then
-		--not implemented yet
-		return
+function makeSendMsg(targetID, msgType, msg)
+	local massage = ID .. targetID .. msgType .. msg
+	local targetSide = switchingTable[targetID]
+	if targetSide == nil then
+		for i = 1 , #modemSides do
+			modems[modemSides[i]].transmit(port, port, massage)
+		end
 	end
-	for i = 1 , #modems, 1 do
-		modems[i].transmit(port, port, msg)
-	end
+	modems[targetSide].transmit(port, port, massage)
 end
+		
 
 function extractRequestHeader(msg)
 	local msgID = string.sub(msg, 1,4)
@@ -78,9 +92,9 @@ function request(msg,  senderID)
 --handle requests (general header striped)	
 	local msgID, msgType, msgBody = extractRequestHeader(msg)
 	if msgType == "ECHO" then
-		send(mkMsg(senderID, "A", mkAns(msgID, msgBody)))	
+		makeSendMsg(senderID, "A", mkAns(msgID, msgBody))
 	elseif msgType == "SUPR" then
-		send(mkMsg(senderID, "A", mkAns(msgID, suportedREQs)))	
+		makeSendMsg(senderID, "A", mkAns(msgID, suportedREQs))	
 	end
 end
 
@@ -93,11 +107,6 @@ end
 --todo input validation
 function mkAns(msgID, msgBody)
 	return msgID .. msgBody
-end
-function answer(msg)
---handle answers (general header striped)	
-
-end
 
 function doing(msg) --do is reserver keyword
 --handle do requests (general header striped)	
@@ -116,7 +125,7 @@ function ping(targetID)
 	local msgID = getReqId()
 	--sending ping
 	print("sending ping")
-	send(mkMsg(targetID, "R", mkReq(msgID, "ECHO", payload)))
+	makeSendMsg(targetID, "R", mkReq(msgID, "ECHO", payload))
 	--waiting for return
 	local retMsgID, retMsgBody = nil
 	repeat
@@ -137,6 +146,7 @@ function lisenNet()
 	while true do
 		local event , side, channel, replyChannel, massage, distance = os.pullEvent("modem_message")
 		local senderID, targetID,  msgType, msgBody = extractMainHeader(massage)
+		addSwitchingTable()
 		if targetID == ID then
 			if msgType == "R" then
 				--handle requests
@@ -155,12 +165,13 @@ function lisenNet()
 				set(msgBody)
 			end
 		else
-			if Switching == true then
-				doSwitching()
+			if switching == true then
+				doSwitching(side, senderID, massage)
 			end
 		end
 	end
 end
+
 function localruning()
 	while true do
 			--main loop of the computer
