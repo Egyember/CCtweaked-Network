@@ -20,7 +20,7 @@ end
 -- finding modems and wraping them
 modems = {}
 perNames = peripheral.getNames()
-for i = 1 , #perNames 1 do
+for i = 1 , #perNames, 1 do
 	if peripheral.getType(perNames[i]) == "modem" then
 		modems[#modems+1] = peripheral.wrap(perNames[i])
 	end
@@ -116,18 +116,13 @@ function ping(targetID)
 	print("sending ping")
 	send(mkMsg(targetID, "R", mkReq(msgID, "ECHO", payload)))
 	--waiting for return
-	local retMsgID, retMsgBody
+	local retMsgID, retMsgBody = nil
 	repeat
 		local event , side, channel, replyChannel, massage, distance = os.pullEvent("modem_message")
 		local senderID, targetID, msgType, msgBody = extractMainHeader(massage)
-		if targetID ~= ID then
-			goto pingnotgood
+		if targetID == ID and msgType == "A" then
+			retMsgID, retMsgBody = extractAnswerHeader(msgBody)
 		end
-		if msgType ~= "A" then
-			goto pingnotgood
-		end
-		retMsgID, retMsgBody = extractAnswerHeader(msgBody)
-		::pingnotgood::
 	until(msgID == retMsgID)
 	if payload == retMsgBody then
 		print("succsesfull ping")
@@ -141,30 +136,28 @@ function lisenNet()
 		local event , side, channel, replyChannel, massage, distance = os.pullEvent("modem_message")
 		massage = tostring(message)
 		local senderID, targetID,  msgType, msgBody = extractMainHeader(massage)
-		if targetID ~= ID then
-			if Switching == false then
-				goto continue_net
-			end
-			doSwitching()
-			goto continue_net
-		end
-		if msgType == "R" then
-			--handle requests
-			request(msgBody, senderID)
-	--[[	this shoud be handeled elsewhere
-		elseif msgType == "A" then
-			--handle answers
-			answer(string.sub(massage, 12,-1))
+		if targetID == ID then
+			if msgType == "R" then
+				--handle requests
+				request(msgBody, senderID)
+		--[[	this shoud be handeled elsewhere
+			elseif msgType == "A" then
+				--handle answers
+				answer(string.sub(massage, 12,-1))
 
-	]]--
-		elseif msgType == "D" then
-			--handle do
-			doing(msgBody)
-		elseif msgType == "S" then
-			--handle set
-			set(msgBody)
+		]]--
+			elseif msgType == "D" then
+				--handle do
+				doing(msgBody)
+			elseif msgType == "S" then
+				--handle set
+				set(msgBody)
+			end
+		else
+			if Switching == true then
+				doSwitching()
+			end
 		end
-		::continue_net::
 	end
 end
 function localruning()
