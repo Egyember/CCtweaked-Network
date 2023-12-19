@@ -32,7 +32,7 @@ do
 	end
 	--init modems
 	for i = 1, #modemSides do
-		modems[modemSides].open(port)
+		modems[modemSides[i]].open(port)
 	end
 end
 
@@ -72,8 +72,9 @@ function makeSendMsg(targetID, msgType, msg)
 		for i = 1 , #modemSides do
 			modems[modemSides[i]].transmit(port, port, massage)
 		end
+	else
+		modems[targetSide].transmit(port, port, massage)
 	end
-	modems[targetSide].transmit(port, port, massage)
 end
 		
 
@@ -108,6 +109,7 @@ end
 --todo input validation
 function mkAns(msgID, msgBody)
 	return msgID .. msgBody
+end
 
 function doing(msg) --do is reserver keyword
 --handle do requests (general header striped)	
@@ -147,7 +149,7 @@ function lisenNet()
 	while true do
 		local event , side, channel, replyChannel, massage, distance = os.pullEvent("modem_message")
 		local senderID, targetID,  msgType, msgBody = extractMainHeader(massage)
-		addSwitchingTable()
+		addSwitchingTable(targetID, side)
 		if targetID == ID then
 			if msgType == "R" then
 				--handle requests
