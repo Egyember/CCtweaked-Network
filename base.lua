@@ -2,8 +2,8 @@
 ID = "base" --must be 4 char
 switchlikeMode = false --switching table
 Switching = false
-osloop = 1
 port = 41
+osloop = 1
 suportedREQs = "ECHO,SUPR"
 
 -- finding modems and wraping them
@@ -20,10 +20,6 @@ for i = 1, #modems, 1 do
 	modems[i].open(port)
 end
 
---init system alarm
-
-osAlarmID = os.setAlarm(os.time() + osloop)
-
 -- low level functions for networking
 function doSwitching()
 	print("not implemeted yet\n")
@@ -39,7 +35,7 @@ function extractMainHeader(msg)
 end
 
 --todo input validation
-function mkMsg(msg, targetID, msgType)
+function mkMsg(targetID, msgType, msg)
 	return ID .. targetID .. msgType .. msg
 end
 
@@ -69,9 +65,9 @@ function request(msg,  senderID)
 --handle requests (general header striped)	
 	local msgID, msgType, msgBody = extractRequestHeader(msg)
 	if msgType == "ECHO" then
-		send(mkMsg(msgID .. msgBody, senderID, "A"))	
+		send(mkMsg(senderID, "A", mkAns(msgID, msgBody)))	
 	elseif msgType == "SUPR" then
-		send(mkMsg(msgID .. suportedREQs, senderID, "A"))	
+		send(mkMsg(senderID, "A", mkAns(msgID, suportedREQs)))	
 	end
 end
 
@@ -104,6 +100,8 @@ end
 function ping(targetID)
 	--generating payload
 	local payload = string.format("%05d", math.floor(math.random*10000))
+	local msgID
+	send(mkMsg(targetID, "R", mkReq(msgID, "ECHO", payload)))	
 
 end
 
@@ -140,12 +138,8 @@ function lisenNet()
 end
 function localruning()
 	while true do
-		local event, alarmIDret = os.pullEvent("alarm")
-		if osAlarmID == alarmIDret then
 			--main loop of the computer
-			
-		osAlarmID = os.setAlarm(os.time() + osloop)
-		end
+		sleep(osloop)		
 	end
 end
 
