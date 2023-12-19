@@ -6,6 +6,17 @@ port = 41
 osloop = 1
 suportedREQs = "ECHO,SUPR"
 
+-- request id generation
+lastReqID = 0
+function getReqId()
+	if lastReqID == 9999 then
+		return "0000"
+	end
+	lastReqID = lastReqID + 1
+	return string.format("%04d", lastReqID)
+end
+
+
 -- finding modems and wraping them
 modems = {}
 perNames = peripheral.getNames()
@@ -100,9 +111,29 @@ end
 function ping(targetID)
 	--generating payload
 	local payload = string.format("%05d", math.floor(math.random*10000))
-	local msgID
-	send(mkMsg(targetID, "R", mkReq(msgID, "ECHO", payload)))	
-
+	local msgID = getReqId()
+	--sending ping
+	print("sending ping")
+	send(mkMsg(targetID, "R", mkReq(msgID, "ECHO", payload)))
+	--waiting for return
+	local retMsgID, retMsgBody
+	repeat
+		local event , side, channel, replyChannel, massage, distance = os.pullEvent("modem_message")
+		local senderID, targetID, msgType, msgBody = extractMainHeader(massage)
+		if targetID ~= ID then
+			goto pingnotgood
+		end
+		if msgType ~= "A" then
+			goto pingnotgood
+		end
+		retMsgID, retMsgBody = extractAnswerHeader(msgBody)
+		::pingnotgood::
+	until(msgID == retMsgID)
+	if payload == retMsgBody then
+		print("succsesfull ping")
+	else
+		print("corrup return / bug")
+	end
 end
 
 function lisenNet()
