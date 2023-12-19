@@ -1,6 +1,5 @@
 --constants
 ID = "base" --must be 4 char
-switchlikeMode = false --switching table
 switching = false
 port = 41
 osloop = 1
