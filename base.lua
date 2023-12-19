@@ -51,7 +51,9 @@ function doSwitching(side, senderID, msg)
 			end
 		end
 	end
-	modems[targetSide].transmit(port, port, msg)
+	if targetSide ~= side then
+		modems[targetSide].transmit(port, port, msg)
+	end
 end
 
 function extractMainHeader(msg)
