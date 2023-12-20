@@ -120,10 +120,9 @@ function mkAns(msgID, msgBody)
 	return msgID .. msgBody
 end
 
-function doing(msg) --do is reserver keyword
+function addDo(msg) --do is reserver keyword
 --handle do requests (general header striped)
-
-
+	doStack.push(msg)	
 end
 
 function set(msg)
@@ -172,7 +171,7 @@ function lisenNet()
 		]]--
 			elseif msgType == "D" then
 				--handle do
-				doing(msgBody)
+				addDo(msgBody)
 			elseif msgType == "S" then
 				--handle set
 				set(msgBody)
@@ -185,6 +184,16 @@ function lisenNet()
 	end
 end
 
+function doingTasks()
+	while true do
+		local task = doStack.pop()
+		if task ~= nil then
+			--do the tasks
+		end
+		if doStack.getn() = nil then
+			sleep(10)
+		end
+
 function localruning()
 	while true do
 			--main loop of the computer
@@ -192,4 +201,4 @@ function localruning()
 	end
 end
 
-parallel.waitForAll(lisenNet, localruning)
+parallel.waitForAll(lisenNet, localruning, doingTasks)
