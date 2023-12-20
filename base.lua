@@ -49,7 +49,7 @@ function addSwitchingTable(senderID, side)
 	switchingTable[senderID] = side	
 end
 
-function doSwitching(side, senderID, msg)
+function doSwitching(side, targetID, msg)
 	local targetSide = switchingTable[targetID]
 	if targetSide == nil then
 		for i = 1 , #modemSides do
@@ -57,8 +57,7 @@ function doSwitching(side, senderID, msg)
 				modems[modemSides[i]].transmit(port, port, msg)
 			end
 		end
-	end
-	if targetSide ~= side then
+	elseif targetSide ~= side then
 		print(targetSide)
 		modems[targetSide].transmit(port, port, msg)
 	end
@@ -160,7 +159,7 @@ function lisenNet()
 	while true do
 		local event , side, channel, replyChannel, massage, distance = os.pullEvent("modem_message")
 		local senderID, targetID,  msgType, msgBody = extractMainHeader(massage)
-		addSwitchingTable(targetID, side)
+		addSwitchingTable(senderID, side)
 		if targetID == ID then
 			if msgType == "R" then
 				--handle requests
@@ -180,7 +179,7 @@ function lisenNet()
 			end
 		else
 			if switching == true then
-				doSwitching(side, senderID, massage)
+				doSwitching(side, targetID, massage)
 			end
 		end
 	end
