@@ -2,11 +2,9 @@
 -- Uses a table as stack, use <table>:push(value) and <table>:pop()
 -- Lua 5.1 compatible
 
--- GLOBAL
-Stack = {}
 
 -- Create a Table with stack functions
-function Stack:Create()
+function createStack()
 
   -- stack table
   local t = {}

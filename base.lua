@@ -7,11 +7,10 @@ suportedREQs = "ECHO,SUPR,SUPD"
 suportedDOs = ""
 
 --loading libs
-require "stack.lua"
+dofile "stack.lua"
 
 --init DO stack
-
-doStack = stack:Create()
+doStack = createStack()
 
 -- request id generation
 lastReqID = 0
