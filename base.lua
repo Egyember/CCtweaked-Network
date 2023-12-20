@@ -3,7 +3,15 @@ ID = "base" --must be 4 char
 switching = false
 port = 41
 osloop = 1
-suportedREQs = "ECHO,SUPR"
+suportedREQs = "ECHO,SUPR,SUPD"
+suportedDOs = ""
+
+--loading libs
+require "stack.lua"
+
+--init DO stack
+
+doStack = stack:Create()
 
 -- request id generation
 lastReqID = 0
@@ -97,6 +105,8 @@ function request(msg,  senderID)
 		makeSendMsg(senderID, "A", mkAns(msgID, msgBody))
 	elseif msgType == "SUPR" then
 		makeSendMsg(senderID, "A", mkAns(msgID, suportedREQs))	
+	elseif msgType == "SUPD" then
+		makeSendMsg(senderID, "A", mkAns(msgID, suportedDOs))	
 	end
 end
 
@@ -112,7 +122,8 @@ function mkAns(msgID, msgBody)
 end
 
 function doing(msg) --do is reserver keyword
---handle do requests (general header striped)	
+--handle do requests (general header striped)
+
 
 end
 
