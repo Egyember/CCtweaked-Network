@@ -5,7 +5,11 @@ switchingBlacklist = "" --IDs not to switch (to avoid switching loops mosty case
 port = 41
 osloop = 1
 suportedREQs = "ECHO,SUPR,SUPD"
-suportedDOs = ""
+suportedDOs = "batteryUpdate"
+
+--global data
+charge = 0
+maxCharge = 0
 
 --loading libs
 dofile "stack.lua"
@@ -112,6 +116,7 @@ function mkReq(msgID, msgType, msgBody)
 	return msgID .. msgType .. msgBody
 end
 
+--todo: charge, maxcharge
 function request(msg,  senderID)
 --handle requests (general header striped)	
 	local msgID, msgType, msgBody = extractRequestHeader(msg)
