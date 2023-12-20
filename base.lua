@@ -59,6 +59,7 @@ function doSwitching(side, senderID, msg)
 		end
 	end
 	if targetSide ~= side then
+		print(targetSide)
 		modems[targetSide].transmit(port, port, msg)
 	end
 end
