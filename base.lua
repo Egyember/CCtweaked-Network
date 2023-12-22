@@ -1,6 +1,7 @@
 --constants
 ID = "base" --must be 4 char
 switching = false
+switchingBlacklist = "" --IDs not to switch (to avoid switching loops mosty cased by ender modem and wireless modem)
 port = 41
 osloop = 1
 suportedREQs = "ECHO,SUPR,SUPD"
@@ -178,7 +179,9 @@ function lisenNet()
 			end
 		else
 			if switching == true then
-				doSwitching(side, targetID, massage)
+				if not string.find(switchingBlacklist, senderID)then
+					doSwitching(side, targetID, massage)
+				end
 			end
 		end
 	end
