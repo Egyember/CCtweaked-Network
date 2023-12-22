@@ -10,7 +10,7 @@ suportedDOs = ""
 dofile "stack.lua"
 
 --init DO stack
-doStack = stack()
+doStack = stack
 
 -- request id generation
 lastReqID = 0
