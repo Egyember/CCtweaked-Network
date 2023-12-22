@@ -189,8 +189,8 @@ function doingTasks()
 		local task = doStack.pop()
 		if task ~= nil then
 			--do the tasks
-		end
-		if doStack.getn() = nil then
+
+		else
 			sleep(10)
 		end
 	end
