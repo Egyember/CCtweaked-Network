@@ -10,7 +10,7 @@ suportedDOs = ""
 dofile "stack.lua"
 
 --init DO stack
-doStack = createStack()
+doStack = stack()
 
 -- request id generation
 lastReqID = 0
@@ -193,6 +193,8 @@ function doingTasks()
 		if doStack.getn() = nil then
 			sleep(10)
 		end
+	end
+end
 
 function localruning()
 	while true do
