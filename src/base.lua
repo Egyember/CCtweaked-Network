@@ -7,6 +7,15 @@ osloop = 1
 suportedREQs = "ECHO,SUPR,SUPD"
 suportedDOs = ""
 
+--global veribales
+battery1 = {}
+battery1.max = 0
+battery1.current = 0
+
+battery2 = {}
+battery2.max = 0
+battery2.current = 0
+
 --loading libs
 dofile "stack.lua"
 
@@ -80,6 +89,25 @@ function ping(targetID)
 	end
 end
 
+function batteryUpdate(targetID)
+	makeSendMsg(targetID, "D", "batteryUpdate")
+	local retMsgBody = nil
+	repeat
+		local msgID = getReqId()
+		makeSendMsg(targetID, "R", mkReq(msgID, "DOIN"))
+		sleep(10)
+		--waiting for return
+		local retMsgID = nil
+		repeat
+			local event , side, channel, replyChannel, massage, distance = os.pullEvent("modem_message")
+			local senderID, targetID, msgType, msgBody = extractMainHeader(massage)
+			if targetID == ID and msgType == "A" then
+				retMsgID, retMsgBody = extractAnswerHeader(msgBody)
+			end
+		until(msgID == retMsgID)
+	until(retMsgBody == "false")
+end
+
 function lisenNet()
 	while true do
 		local event , side, channel, replyChannel, massage, distance = os.pullEvent("modem_message")
@@ -130,7 +158,33 @@ end
 
 function localruning()
 	while true do
-			--main loop of the computer
+		local function batteryUpdate1()
+			batteryUpdate("BAT1")
+		end
+		local function batteryUpdate2()
+			batteryUpdate("BAT2")
+		end
+		parallel.waitForAll(batteryUpdate1, batteryUpdate2)
+		local function getBatteryStatus(targetID)	
+			local msgID = getReqId()
+			makeSendMsg(targetID, "R", mkReq(msgID, "BATS"))
+			
+			--waiting for return
+			local retMsgID, retMsgBody = nil
+			repeat
+				local event , side, channel, replyChannel, massage, distance = os.pullEvent("modem_message")
+				local senderID, targetID, msgType, msgBody = extractMainHeader(massage)
+				if targetID == ID and msgType == "A" then
+					retMsgID, retMsgBody = extractAnswerHeader(msgBody)
+				end
+			until(msgID == retMsgID)
+			local current = tonumber(string.sub(retMsgBody, 1, 10))
+			local max = tonumber(string.sub(retMsgBody, 11, -1))
+			return current, max
+		end
+		
+		battery1.current, battery1.max = getBatteryStatus("BAT1") 
+		battery2.current, battery2.max = getBatteryStatus("BAT2") 
 		sleep(osloop)		
 	end
 end
