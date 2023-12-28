@@ -4,17 +4,17 @@ switching = false
 switchingBlacklist = "" --IDs not to switch (to avoid switching loops mosty cased by ender modem and wireless modem)
 port = 41
 osloop = 1
-suportedREQs = "ECHO,SUPR,SUPD"
+suportedREQs = "ECHO,SUPR,SUPD,REPB"
 suportedDOs = ""
+numberOfBatterys = 2
 
 --global veribales
-battery1 = {}
-battery1.max = 0
-battery1.current = 0
-
-battery2 = {}
-battery2.max = 0
-battery2.current = 0
+battery = {}
+for i=1 , numberOfBatterys do
+	battery[i] = {}
+	battery[i].max = 0
+	battery[i].current = 0
+end
 
 --loading libs
 dofile "stack.lua"
@@ -183,8 +183,9 @@ function localruning()
 			return current, max
 		end
 		
-		battery1.current, battery1.max = getBatteryStatus("BAT1") 
-		battery2.current, battery2.max = getBatteryStatus("BAT2") 
+		for i=1 , numberOfBatterys do
+			battery[i].current, battery[i].max = getBatteryStatus("BAT" .. tostring(i))
+		end
 		sleep(osloop)		
 	end
 end
