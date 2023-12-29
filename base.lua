@@ -95,6 +95,9 @@ end
 
 --todo input validation
 function mkReq(msgID, msgType, msgBody)
+	if msgBody == nil then
+		msgBody = ""
+	end
 	return msgID .. msgType .. msgBody
 end
 
