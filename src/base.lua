@@ -132,7 +132,9 @@ function request(msg,  senderID)
 	elseif msgType == "DOIN" then
 		makeSendMsg(senderID, "A", mkAns(msgID, tostring(doInprogress)))
 	elseif msgType == "BATS" then
-		makeSendMsg(senderID, "A", mkAns(msgID, string.format("%10d,%d10d", charge, maxcharge)))	
+		local payload = string.format("%10d,%d10d", charge, maxcharge)
+		print(payload)
+		makeSendMsg(senderID, "A", mkAns(msgID, payload))	
 	end
 end
 
