@@ -95,11 +95,13 @@ function batteryUpdate(targetID)
 	repeat
 		local msgID = getReqId()
 		makeSendMsg(targetID, "R", mkReq(msgID, "DOIN"))
-		sleep(10)
+		print("send req")
 		--waiting for return
 		local retMsgID = nil
 		repeat
+			print("wait event")
 			local event , side, channel, replyChannel, massage, distance = os.pullEvent("modem_message")
+			print("got event")
 			local senderID, targetID, msgType, msgBody = extractMainHeader(massage)
 			if targetID == ID and msgType == "A" then
 				retMsgID, retMsgBody = extractAnswerHeader(msgBody)
