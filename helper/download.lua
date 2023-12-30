@@ -1,1 +1,1 @@
-shell.run("wget "
+shell.run("wget https://github.com/Egyember/CCtweaked-Network/raw/master/src/base.lua", "wget https://github.com/Egyember/CCtweaked-Network/raw/master/src/stack.lua", "wget https://github.com/Egyember/CCtweaked-Network/raw/master/src/startup.lua")
