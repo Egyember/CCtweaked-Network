@@ -11,6 +11,13 @@ suportedDOs = ""
 dofile "stack.lua"
 
 --init DO stack
+do
+	local files = fs.list("/do")
+	for i = 1, table.getn(files) do
+		suportedDOs = suportedDOs .. "," .. string.sub(files[i],-4,-1)
+	end
+	print("suportedDOs: " .. suportedDOs)
+end
 doStack = stack
 
 -- request id generation
@@ -194,8 +201,12 @@ function doingTasks()
 	while true do
 		local task = doStack.pop()
 		if task ~= nil then
-			--do the tasks
-
+			local PATH = "/do/".. task ..".lua"--do the tasks
+			if fs.exists(PATH) then
+				dofile(PATH)
+			else
+				print("task don't exits " .. PATH)
+			end
 		else
 			sleep(10)
 		end
