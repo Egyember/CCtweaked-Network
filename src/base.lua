@@ -14,7 +14,7 @@ dofile "stack.lua"
 do
 	local files = fs.list("/do")
 	for i = 1, table.getn(files) do
-		suportedDOs = suportedDOs .. "," .. string.sub(files[i],-4,-1)
+		suportedDOs = suportedDOs .. "," .. string.sub(files[i],1,-4)
 	end
 	print("suportedDOs: " .. suportedDOs)
 end
