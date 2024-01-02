@@ -4,12 +4,13 @@ switching = false
 switchingBlacklist = "" --IDs not to switch (to avoid switching loops mosty cased by ender modem and wireless modem)
 port = 41
 osloop = 1
-suportedREQs = "ECHO,SUPR,SUPD"
+suportedREQs = "ECHO,SUPR,SUPD,DOIN,BATS"
 suportedDOs = "batteryUpdate"
 
 --global data
 charge = 0
 maxCharge = 0
+doInprogress = false
 
 --loading libs
 dofile "stack.lua"
@@ -126,6 +127,10 @@ function request(msg,  senderID)
 		makeSendMsg(senderID, "A", mkAns(msgID, suportedREQs))	
 	elseif msgType == "SUPD" then
 		makeSendMsg(senderID, "A", mkAns(msgID, suportedDOs))	
+	elseif msgType == "DOIN" then
+		makeSendMsg(senderID, "A", mkAns(msgID, tostring(doInprogress)))
+	elseif msgType == "BATS" then
+		makeSendMsg(senderID, "A", mkAns(msgID, string.format("%10d,%d10d", charge, maxcharge)))	
 	end
 end
 
@@ -210,11 +215,13 @@ function doingTasks()
 	while true do
 		local task = doStack.pop()
 		if task ~= nil then
+<<<<<<< HEAD:src/base.lua
 			local PATH = "/do/".. task ..".lua"--do the tasks
 			if fs.exists(PATH) then
 				dofile(PATH)
 			else
 				print("task don't exits " .. PATH)
+>>>>>>> 8c83baa (charge req):base.lua
 			end
 		else
 			sleep(10)
@@ -222,11 +229,4 @@ function doingTasks()
 	end
 end
 
-function localruning()
-	while true do
-			--main loop of the computer
-		sleep(osloop)		
-	end
-end
-
-parallel.waitForAll(lisenNet, localruning, doingTasks)
+parallel.waitForAll(lisenNet, doingTasks)
