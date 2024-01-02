@@ -5,7 +5,7 @@ switchingBlacklist = "" --IDs not to switch (to avoid switching loops mosty case
 port = 41
 osloop = 1
 suportedREQs = "ECHO,SUPR,SUPD,DOIN,BATS"
-suportedDOs = "batteryUpdate"
+suportedDOs = ""
 fueldir = "down"
 numberOfBatterys = 6 --[0:9]
 
