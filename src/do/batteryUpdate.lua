@@ -39,14 +39,8 @@ local function sampleEnergy()
 		lastsuc = turtle.forward()
 	end
 	--returning home
-	local homeDist = numberOfBatterys *2
-	if not lastsuc then
-		homeDist = homeDist-1
-	end
-	for i = 1, homeDist do
-		turtle.back()
+	while turtle.back() do
 	end
 	return capSum, maxcapSum
 end
 charge, maxCharge = sampleEnergy()
-
