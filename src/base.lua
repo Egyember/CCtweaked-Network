@@ -15,9 +15,9 @@ do
 	local files = fs.list("/do")
 	for i = 1, table.getn(files) do
 		if i == 1 then
-			suportedDOs = suportedDOs .. string.sub(files[i],1,-4)
+			suportedDOs = suportedDOs .. string.sub(files[i],1,-5)
 		else
-			suportedDOs = suportedDOs .. "," .. string.sub(files[i],1,-4)
+			suportedDOs = suportedDOs .. "," .. string.sub(files[i],1,-5)
 		end
 	end
 	print("suportedDOs: " .. suportedDOs)
