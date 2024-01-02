@@ -2,5 +2,5 @@ shell.run("wget https://github.com/Egyember/CCtweaked-Network/raw/turtle(battery
 shell.run("wget https://github.com/Egyember/CCtweaked-Network/raw/turtle(battery)/src/stack.lua")
 shell.run("wget https://github.com/Egyember/CCtweaked-Network/raw/turtle(battery)/src/startup.lua")
 fs.makeDir("/do")
-shell.run("wget https://github.com/Egyember/CCtweaked-Network/raw/turtle(battery)/src/do/batteryupdate.lua")
+shell.run("wget https://github.com/Egyember/CCtweaked-Network/raw/turtle(battery)/src/do/batteryUpdate.lua")
 fs.makeDir("mv batteryupdate.lua /do/")
