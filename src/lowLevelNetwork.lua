@@ -64,15 +64,6 @@ function request(msg,  senderID)
 		makeSendMsg(senderID, "A", mkAns(msgID, suportedREQs))	
 	elseif msgType == "SUPD" then
 		makeSendMsg(senderID, "A", mkAns(msgID, suportedDOs))	
-	elseif msgType == "REPB" then
-		local function batteryToStr(numberOfBatterys)
-			local str = ""
-			for i = 1, numberOfBatterys do
-				str = str .. string.format("%10d%10d", battery[i].current, battery[i].max)
-			end
-			return str
-		end
-		makeSendMsg(senderID, "A", mkAns(msgID, batteryToStr(numberOfBatterys)))	
 	end
 end
 
