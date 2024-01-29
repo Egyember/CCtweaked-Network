@@ -1,3 +1,4 @@
+dofile "globalVariable.lua"
 -- low level functions for networking
 switchingTable = {}
 function addSwitchingTable(senderID, side)
