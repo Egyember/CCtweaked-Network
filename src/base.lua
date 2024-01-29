@@ -227,5 +227,5 @@ function doingTasks()
 		end
 	end
 end
-
+addDo("returnHome")
 parallel.waitForAll(lisenNet, doingTasks)
