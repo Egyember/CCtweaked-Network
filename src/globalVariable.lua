@@ -6,4 +6,6 @@ port = 41
 osloop = 1
 suportedREQs = "ECHO,SUPR,SUPD"
 suportedDOs = ""
-
+if init ~=nil then
+	dofile "init.lua"
+end
