@@ -1,3 +1,4 @@
+dofile "globalVariable.lua"
 --loading libs
 dofile "stack.lua"
 
