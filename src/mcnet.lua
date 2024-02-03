@@ -29,7 +29,7 @@ function network:init()
 		for i = 1, table.getn(files) do
 			self.suportedREQs = self.suportedREQs .. "," .. string.sub(files[i],1,-5)
 		end
-		print("suportedDOs: " .. self.suportedDOs)
+		print("suportedREQs: " .. self.suportedREQs)
 	end
 
 	-- finding modems and wraping them
@@ -150,7 +150,7 @@ function network:init()
 		elseif msgType == "SUPD" then
 			self:makeSendMsg(senderID, "A", self:mkAns(msgID, self.suportedDOs))	
 		else
-			if msgType ~= nil --costum requests
+			if msgType ~= nil then --costum requests
 				local PATH = "/req/".. msgType ..".lua"--do the tasks
 				if fs.exists(PATH) then
 					local userFucntion = dofile(PATH)
@@ -160,6 +160,7 @@ function network:init()
 				end
 			end
 		end
+	end
 
 	function self:extractAnswerHeader(msg)
 		local msgID = string.sub(msg, 1,4)
@@ -240,24 +241,43 @@ function network:init()
 	function self:ping(targetID)
 		--generating payload
 		local payload = string.format("%05d", math.floor(math.random()*10000))
-		local msgID = self:getReqID()
 		--sending ping
 		print("sending ping")
-		self:makeSendMsg(targetID, "R",self:mkReq(msgID, "ECHO", payload))
-		--waiting for return
-		local retMsgID, retMsgBody = nil
+		local retMsgBody, distance = nil
+		local function pinging()
+			retMsgBody, distance = self:requestAllInOne(targetID, "ECHO", payload)
+		end
+		local function sleep5()
+			sleep(5)
+			print("timeout")
+		end
+		parallel.waitForAny(pinging, sleep5)
+		if payload == retMsgBody then
+			print("succsesfull ping")
+			return true, distance
+		end
+		print("corrup return / bug")
+		return false, -1
+	end
+
+	function self:requestAllInOne(targetID, reqType, payload)
+		if payload == nil then
+			payload = ""
+		end
+		local msgID = self:getReqID()
+		self:makeSendMsg(targetID, "R",self:mkReq(msgID, reqType, payload))
+		local retMsgID, retMsgBody, distance = nil
 		repeat
-			local event , side, channel, replyChannel, massage, distance = os.pullEvent("modem_message")
+			local event , side, channel, replyChannel, massage
+			event , side, channel, replyChannel, massage, distance = os.pullEvent("modem_message")
 			local senderID, targetID, msgType, msgBody = self:extractMainHeader(massage)
 			if targetID == self.ID and msgType == "A" then
 				retMsgID, retMsgBody = self:extractAnswerHeader(msgBody)
 			end
 		until(msgID == retMsgID)
-		if payload == retMsgBody then
-			print("succsesfull ping")
-		else
-			print("corrup return / bug")
-		end
+		return retMsgBody, distance
 	end
+
 end
+
 return network
