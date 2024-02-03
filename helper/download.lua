@@ -1,5 +1,3 @@
-shell.run("wget https://github.com/Egyember/CCtweaked-Network/raw/master/src/base.lua")
-shell.run("wget https://github.com/Egyember/CCtweaked-Network/raw/master/src/stack.lua")
-shell.run("wget https://github.com/Egyember/CCtweaked-Network/raw/master/src/startup.lua")
-shell.run("wget https://github.com/Egyember/CCtweaked-Network/raw/master/src/globalVariable.lua")
+shell.run("wget https://github.com/Egyember/CCtweaked-Network/raw/master/src/mcnet.lua")
 fs.makeDir("/do")
+fs.makeDir("/req")
