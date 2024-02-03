@@ -23,6 +23,15 @@ function network:init()
 		print("suportedDOs: " .. self.suportedDOs)
 	end
 
+	--init requests
+	do
+		local files = fs.list("/req")
+		for i = 1, table.getn(files) do
+			self.suportedREQs = self.suportedREQs .. "," .. string.sub(files[i],1,-5)
+		end
+		print("suportedDOs: " .. self.suportedDOs)
+	end
+
 	-- finding modems and wraping them
 	do
 		self.modems = {}
@@ -137,11 +146,19 @@ function network:init()
 		if msgType == "ECHO" then
 			self:makeSendMsg(senderID, "A", self:mkAns(msgID, msgBody))
 		elseif msgType == "SUPR" then
-			self:makeSendMsg(senderID, "A", self:mkAns(msgID, suportedREQs))	
+			self:makeSendMsg(senderID, "A", self:mkAns(msgID, self.suportedREQs))	
 		elseif msgType == "SUPD" then
-			self:makeSendMsg(senderID, "A", self:mkAns(msgID, suportedDOs))	
+			self:makeSendMsg(senderID, "A", self:mkAns(msgID, self.suportedDOs))	
+		else
+			if msgType ~= nil --costum requests
+				local PATH = "/req/".. msgType ..".lua"--do the tasks
+				if fs.exists(PATH) then
+					self:makeSendMsg(senderID, "A", self:mkAns(msgID, dofile(PATH)))	
+				else
+					print("request don't exits " .. PATH)
+				end
+			end
 		end
-	end
 
 	function self:extractAnswerHeader(msg)
 		local msgID = string.sub(msg, 1,4)
