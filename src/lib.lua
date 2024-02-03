@@ -153,7 +153,8 @@ function network:init()
 			if msgType ~= nil --costum requests
 				local PATH = "/req/".. msgType ..".lua"--do the tasks
 				if fs.exists(PATH) then
-					self:makeSendMsg(senderID, "A", self:mkAns(msgID, dofile(PATH)))	
+					local userFucntion = dofile(PATH)
+					self:makeSendMsg(senderID, "A", self:mkAns(msgID, userFucntion(msgBody)))	
 				else
 					print("request don't exits " .. PATH)
 				end
