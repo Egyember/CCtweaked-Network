@@ -7,6 +7,7 @@ function network:init()
 	self.osloop = 1
 	self.suportedREQs = "ECHO,SUPR,SUPD"
 	self.suportedDOs = ""
+	self.doInProgress = false
 	self.switchingTable = {}
 	self.debug = false
 
@@ -154,7 +155,7 @@ function network:init()
 				local PATH = "/req/".. msgType ..".lua"--do the tasks
 				if fs.exists(PATH) then
 					local userFucntion = dofile(PATH)
-					self:makeSendMsg(senderID, "A", self:mkAns(msgID, userFucntion(msgBody)))	
+					self:makeSendMsg(senderID, "A", self:mkAns(msgID, userFucntion(msgBody, self.doInProgress)))	
 				else
 					print("request don't exits " .. PATH)
 				end
@@ -222,6 +223,7 @@ function network:init()
 		while true do
 			local task = self.doStack:pop()
 			if task ~= nil then
+				self.doInProgress = true
 				local PATH = "/do/".. task ..".lua"--do the tasks
 				if fs.exists(PATH) then
 					dofile(PATH)
@@ -229,6 +231,7 @@ function network:init()
 					print("task don't exits " .. PATH)
 				end
 			else
+				self.doInProgress = false
 				sleep(10)
 			end
 		end
