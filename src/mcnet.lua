@@ -9,6 +9,7 @@ function network:init()
 	self.suportedDOs = ""
 	self.switchingTable = {}
 	self.debug = false
+	self.context = {} --costume data stored in the network object for requests
 
 	--init DO stack
 	do
@@ -154,7 +155,7 @@ function network:init()
 				local PATH = "/req/".. msgType ..".lua"--do the tasks
 				if fs.exists(PATH) then
 					local userFucntion = dofile(PATH)
-					self:makeSendMsg(senderID, "A", self:mkAns(msgID, userFucntion(msgBody)))	
+					self:makeSendMsg(senderID, "A", self:mkAns(msgID, userFucntion(msgBody, self.context)))	
 				else
 					print("request don't exits " .. PATH)
 				end
