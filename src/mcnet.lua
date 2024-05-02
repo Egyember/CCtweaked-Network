@@ -142,7 +142,7 @@ function network:init()
 		--handle requests (general header striped)	
 		local msgID, msgType, msgBody = self:extractRequestHeader(msg)
 		if self.debug then
-			print("msgID: " .. msgID .. "msgType: " .. msgType .. "msgBody: " .. msgBody)
+			print("msgID: " .. msgID .. "\nmsgType: " .. msgType .. "\nmsgBody: " .. msgBody)
 		end
 		if msgType == "ECHO" then
 			self:makeSendMsg(senderID, "A", self:mkAns(msgID, msgBody))
@@ -155,7 +155,7 @@ function network:init()
 				local PATH = "/req/".. msgType ..".lua"--do the tasks
 				if fs.exists(PATH) then
 					local userFucntion = dofile(PATH)
-					self:makeSendMsg(senderID, "A", self:mkAns(msgID, userFucntion(msgBody, self.context)))	
+					self:makeSendMsg(senderID, "A", self:mkAns(msgID, userFucntion[msgType](msgBody, self.context)))	
 				else
 					print("request don't exits " .. PATH)
 				end
