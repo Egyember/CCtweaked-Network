@@ -152,7 +152,7 @@ function network:init()
 		elseif msgType == "SUPD" then
 			self:makeSendMsg(senderID, "A", self:mkAns(msgID, self.suportedDOs))	
 		elseif msgType == "DUIN" then
-			self:makeSendMsg(senderID, "A", self:mkAns(msgID, self.doing))	
+			self:makeSendMsg(senderID, "A", self:mkAns(msgID, tostring(self.doing)))	
 		else
 			if msgType ~= nil then --costum requests
 				local PATH = "/req/".. msgType ..".lua"--do the tasks
@@ -235,7 +235,7 @@ function network:init()
 					print("task don't exits " .. PATH)
 				end
 			else
-				self.doing = flase
+				self.doing = false
 				sleep(10)
 			end
 		end
