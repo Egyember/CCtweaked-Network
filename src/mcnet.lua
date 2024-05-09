@@ -229,7 +229,7 @@ function network:init()
 				self.doing = true
 				local PATH = "/do/".. task ..".lua"--do the tasks
 				if fs.exists(PATH) then
-					userFucntion = dofile(PATH)
+					local userFucntion = dofile(PATH)
 					userFucntion[task](self.context)
 				else
 					print("task don't exits " .. PATH)
