@@ -7,6 +7,7 @@ function network:init()
 	self.osloop = 1
 	self.suportedREQs = "ECHO,SUPR,SUPD"
 	self.suportedDOs = ""
+	self.doInProgress = false
 	self.switchingTable = {}
 	self.debug = false
 	self.context = {} --costume data stored in the network object for requests
