@@ -10,6 +10,7 @@ function network:init()
 	self.switchingTable = {}
 	self.debug = false
 	self.context = {} --costume data stored in the network object for requests
+	self.doing = true -- true at startup 
 
 	--init DO stack
 	do
@@ -150,6 +151,8 @@ function network:init()
 			self:makeSendMsg(senderID, "A", self:mkAns(msgID, self.suportedREQs))	
 		elseif msgType == "SUPD" then
 			self:makeSendMsg(senderID, "A", self:mkAns(msgID, self.suportedDOs))	
+		elseif msgType == "DUIN" then
+			self:makeSendMsg(senderID, "A", self:mkAns(msgID, self.doing))	
 		else
 			if msgType ~= nil then --costum requests
 				local PATH = "/req/".. msgType ..".lua"--do the tasks
@@ -223,6 +226,7 @@ function network:init()
 		while true do
 			local task = self.doStack:pop()
 			if task ~= nil then
+				self.doing = true
 				local PATH = "/do/".. task ..".lua"--do the tasks
 				if fs.exists(PATH) then
 					dofile(PATH)
@@ -230,6 +234,7 @@ function network:init()
 					print("task don't exits " .. PATH)
 				end
 			else
+				self.doing = flase
 				sleep(10)
 			end
 		end
