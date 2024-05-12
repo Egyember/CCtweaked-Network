@@ -5,12 +5,13 @@ function network:init()
 	self.switchingBlacklist = "" --IDs not to switch (to avoid switching loops mosty cased by ender modem and wireless modem)
 	self.port = 41
 	self.osloop = 1
-	self.suportedREQs = "ECHO,SUPR,SUPD"
+	self.suportedREQs = "ECHO,SUPR,SUPD,DOIN"
 	self.suportedDOs = ""
 	self.switchingTable = {}
 	self.debug = false
-	self.context = {} --costume data stored in the network object for requests
 	self.doing = true -- true at startup 
+	self.context = {} --costume data stored in the network object for requests
+	self.keys = {} -- setable variables over the network
 
 	--init DO stack
 	do
@@ -151,7 +152,7 @@ function network:init()
 			self:makeSendMsg(senderID, "A", self:mkAns(msgID, self.suportedREQs))	
 		elseif msgType == "SUPD" then
 			self:makeSendMsg(senderID, "A", self:mkAns(msgID, self.suportedDOs))	
-		elseif msgType == "DUIN" then
+		elseif msgType == "DOIN" then
 			self:makeSendMsg(senderID, "A", self:mkAns(msgID, tostring(self.doing)))	
 		else
 			if msgType ~= nil then --costum requests
@@ -182,9 +183,32 @@ function network:init()
 		self.doStack:push(msg)	
 	end
 
-	function self:set(msg)
+	function self:setValue(msg)
+		if msg == nil then
+			return 
+		end
 		--handle set requests (general header striped)	
 		--todo: implemet this
+		--key:value;key2:value2
+		local function split (inputstr, sep) --https://stackoverflow.com/questions/1426954/split-string-in-lua
+			if sep == nil then
+				sep = "%s"
+			end
+			local t={}
+			for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+				table.insert(t, str)
+			end
+			return t
+		end
+		local pair = split(msg, ";")
+		for i,v in iparis(pair) do
+			local t = split(v, ":")
+			self.keys[t[i]] = t[2]
+		end
+	end
+
+	function self:getValue(key)
+		return self.keys[key]
 	end
 
 	function self:lisenNet()
@@ -209,7 +233,7 @@ function network:init()
 					self:addDo(msgBody)
 				elseif msgType == "S" then
 					--handle set
-					self:set(msgBody)
+					self:setvalue(msgBody)
 				end
 			else
 				if self.switching == true then
