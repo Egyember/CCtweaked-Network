@@ -84,7 +84,7 @@ function network:init()
 		if targetSide == nil then
 			for i = 1 , #self.modemSides do
 				if self.modemSides[i] ~= side then
-					self.modems[modemSides[i]].transmit(self.port, self.port, msg)
+					self.modems[self.modemSides[i]].transmit(self.port, self.port, msg)
 				end
 			end
 		elseif targetSide ~= side then
@@ -142,6 +142,7 @@ function network:init()
 
 	function self:request(msg,  senderID)
 		--handle requests (general header striped)	
+		--todo: refactor into a table for performance
 		local msgID, msgType, msgBody = self:extractRequestHeader(msg)
 		if self.debug then
 			print("msgID: " .. msgID .. "\nmsgType: " .. msgType .. "\nmsgBody: " .. msgBody)
@@ -179,7 +180,6 @@ function network:init()
 	end
 
 	function self:addDo(msg)
-		--handle do requests (general header striped)
 		self.doStack:push(msg)	
 	end
 
@@ -187,8 +187,6 @@ function network:init()
 		if msg == nil then
 			return 
 		end
-		--handle set requests (general header striped)	
-		--todo: implemet this
 		--key:value;key2:value2
 		local function split (inputstr, sep) --https://stackoverflow.com/questions/1426954/split-string-in-lua
 			if sep == nil then
@@ -223,11 +221,6 @@ function network:init()
 				if msgType == "R" then
 					--handle requests
 					self:request(msgBody, senderID)
-					--[[	this shoud be handeled elsewhere
-					elseif msgType == "A" then
-					--handle answers
-					answer(string.sub(massage, 12,-1))
-					]]--
 				elseif msgType == "D" then
 					--handle do
 					self:addDo(msgBody)
@@ -244,7 +237,6 @@ function network:init()
 			end
 		end
 	end
-
 
 	function self:doingTasks()
 		while true do
@@ -265,9 +257,23 @@ function network:init()
 		end
 	end
 
-
-
-
+	function self:requestAllInOne(targetID, reqType, payload)
+		if payload == nil then
+			payload = ""
+		end
+		local msgID = self:getReqID()
+		self:makeSendMsg(targetID, "R",self:mkReq(msgID, reqType, payload))
+		local retMsgID, retMsgBody, distance = nil
+		repeat
+			local event , side, channel, replyChannel, massage
+			event , side, channel, replyChannel, massage, distance = os.pullEvent("modem_message")
+			local senderID, targetID, msgType, msgBody = self:extractMainHeader(massage)
+			if targetID == self.ID and msgType == "A" then
+				retMsgID, retMsgBody = self:extractAnswerHeader(msgBody)
+			end
+		until(msgID == retMsgID)
+		return retMsgBody, distance
+	end
 
 	function self:ping(targetID)
 		--generating payload
@@ -289,24 +295,6 @@ function network:init()
 		end
 		print("corrup return / bug")
 		return false, -1
-	end
-
-	function self:requestAllInOne(targetID, reqType, payload)
-		if payload == nil then
-			payload = ""
-		end
-		local msgID = self:getReqID()
-		self:makeSendMsg(targetID, "R",self:mkReq(msgID, reqType, payload))
-		local retMsgID, retMsgBody, distance = nil
-		repeat
-			local event , side, channel, replyChannel, massage
-			event , side, channel, replyChannel, massage, distance = os.pullEvent("modem_message")
-			local senderID, targetID, msgType, msgBody = self:extractMainHeader(massage)
-			if targetID == self.ID and msgType == "A" then
-				retMsgID, retMsgBody = self:extractAnswerHeader(msgBody)
-			end
-		until(msgID == retMsgID)
-		return retMsgBody, distance
 	end
 
 end
